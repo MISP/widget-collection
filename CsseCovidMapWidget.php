@@ -235,6 +235,7 @@ class CsseCovidMapWidget
             }
         }
         $data['scope'] = Inflector::humanize($options['type']);
+        $data['colour_scale'] = json_encode(array('#F08080', '#8B0000'), true);
         return $data;
     }
 
