@@ -4,22 +4,26 @@ class CsseCovidTrendsWidget
 {
     public $title = 'CSSE Covid-19 trends';
     public $render = 'MultiLineChart';
-    public $width = 3;
-    public $height = 4;
+    public $width = 4;
+    public $height = 5;
     public $params = array(
         'event_info' => 'Substring included in the info field of relevant CSSE COVID-19 events.',
-        'type' => 'Type of data used for the widget (confirmed, death, recovered, mortality).',
-        'insight' => 'Insight type (rate_of_growth, ).',
-        'countries' => 'List of countries to be included.',
-        'timeframe' => 'Timeframe for events taken into account in days (going back from now, using the date field).'
+        'type' => 'Type of data used for the widget - confirmed (default), death, recovered, mortality.',
+        'insight' => 'Insight type - raw (default), growth, percent.',
+        'countries' => 'List of countries to be included (using the names used by the reports, such as Belgium, US, Germany).',
+        'timeframe' => 'Timeframe for events taken into account in days (going back from now, using the date field, default 10).'
     );
-    public $description = 'Widget visualising the countries ranked by highest count in the chosen category.';
+    public $description = 'Widget showing line charts for the evolution of the various case types.';
     public $placeholder =
 '{
     "event_info": "%CSSE COVID-19 daily report%",
     "type": "confirmed",
-    "logarithmic": 1
+    "insight": "growth",
+    "countries": ["Luxembourg", "Germany", "Belgium", "France"],
+    "timeframe": 20
 }';
+    public $cacheLifetime = 600;
+    public $autoRefreshDelay = false;
 
     private $__countries = array();
 
@@ -30,7 +34,7 @@ class CsseCovidTrendsWidget
             $options['Insight'] = 'calculate_growth_rate';
         }
         if (empty($options['timeframe'])) {
-            $options['timeframe'] = 30;
+            $options['timeframe'] = 10;
         }
         $event_info_condition = empty($options['event_info']) ? '%CSSE COVID-19 daily report%' : $options['event_info'];
         $params = array(
