@@ -80,7 +80,7 @@ class CsseCovidTrendsWidget
             ),
             'type' => array(
                 'confirmed' => 'confirmed cases',
-                'death' => 'morbidities',
+                'death' => 'mortalities',
                 'recovered' => 'recoveries',
                 'mortality' => 'mortality rate'
             )
