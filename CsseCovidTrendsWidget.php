@@ -36,6 +36,12 @@ class CsseCovidTrendsWidget
         if (empty($options['timeframe'])) {
             $options['timeframe'] = 10;
         }
+        if (empty($options['countries'])) {
+            $options['countries'] = array("Luxembourg", "Germany", "Belgium", "France");
+        }
+        if (empty($options['insight'])) {
+            $options['insight'] = 'raw';
+        }
         $event_info_condition = empty($options['event_info']) ? '%CSSE COVID-19 daily report%' : $options['event_info'];
         $params = array(
             'eventinfo' => $event_info_condition,
