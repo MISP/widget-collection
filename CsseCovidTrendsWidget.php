@@ -125,7 +125,7 @@ class CsseCovidTrendsWidget
         }
         if ($options['type'] === 'mortality') {
             foreach ($data as $k => $v) {
-                $data[$k] = round(100 * (empty($v['death']) ? 0 : $v['death']) / $v['confirmed'], 2);
+                $data[$k]['mortality'] = round(100 * (empty($v['death']) ? 0 : $v['death']) / $v['confirmed'], 2);
             }
         }
         if (!empty($options['insight']) && $options['insight'] !== 'raw') {
