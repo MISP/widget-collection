@@ -22,7 +22,7 @@ class CsseCovidTrendsWidget
     "countries": ["Luxembourg", "Germany", "Belgium", "France"],
     "timeframe": 20
 }';
-    public $cacheLifetime = 600;
+    //public $cacheLifetime = 600;
     public $autoRefreshDelay = false;
 
     private $__countries = array();
@@ -150,7 +150,7 @@ class CsseCovidTrendsWidget
             }
         } else {
             foreach ($data as $k => &$countryData) {
-                $data[$k]['raw'] = $data[$k]['confirmed'];
+                $data[$k]['raw'] = $data[$k][$options['type']];
             }
         }
         return $data;
