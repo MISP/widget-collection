@@ -9,15 +9,29 @@ class CsseCovidWidget
     public $params = array(
         'event_info' => 'Substring included in the info field of relevant CSSE COVID-19 events.',
         'type' => 'Type of data used for the widget (confirmed, death, recovered, mortality).',
-        'logarithmic' => 'Use a log10 scale for the graph (set via 0/1).'
+        'logarithmic' => 'Use a log10 scale for the graph (set via 0/1).',
+        'relative' => 'Take the country\'s population size into account (count / 1M)'
     );
     public $description = 'Widget visualising the countries ranked by highest count in the chosen category.';
     public $placeholder =
 '{
     "event_info": "%CSSE COVID-19 daily report%",
     "type": "confirmed",
-    "logarithmic": 1
+    "logarithmic": 1,
+    "relative": 0
 }';
+
+    public $__nameReplacements = array(
+        'US' => 'United States',
+        'Cote d\'Ivoire' => 'Ivory Coast',
+        'Holy See' => 'Vatican',
+        'Congo (Kinshasa)' => 'Democratic Republic of Congo',
+        'Taiwan*' => 'Taiwan',
+        'Korea, South' => 'South Korea'
+    );
+
+
+    private $__populationData = array();
 
     public function handler($user, $options = array())
     {
@@ -44,6 +58,25 @@ class CsseCovidWidget
         if (!empty($options['type']) && $options['type'] === 'mortality') {
             $data['output_decorator'] = 'percentage';
         }
+        if ($options['type'] !== 'mortality' && !empty($options['relative'])) {
+            $this->__getPopulationData();
+            if (!empty($this->__populationData)) {
+                foreach ($data['data'] as $country => $value) {
+                    if (isset($this->__nameReplacements[$country])) {
+                        $alias = $this->__nameReplacements[$country];
+                    } else {
+                        $alias = $country;
+                    }
+                    if (empty($this->__populationData[$alias])) {
+                        unset($data['data'][$country]);
+                    } else {
+                        $pre = $data['data'][$country];
+                        $data['data'][$country] = round(10000000 * $data['data'][$country] / $this->__populationData[$alias]);
+                    }
+                }
+            }
+            arsort($data['data']);
+        }
         if (!empty($options['logarithmic'])) {
             $data['logarithmic'] = array();
             foreach ($data['data'] as $k => $v) {
@@ -58,6 +91,27 @@ class CsseCovidWidget
             }
         }
         return $data;
+    }
+
+    private function __getPopulationData()
+    {
+        $this->Galaxy = ClassRegistry::init('Galaxy');
+        $galaxy = $this->Galaxy->find('first', array(
+            'recursive' => -1,
+            'contain' => array('GalaxyCluster' => array('GalaxyElement')),
+            'conditions' => array('Galaxy.name' => 'Country')
+        ));
+        if (empty($galaxy)) {
+            return false;
+        }
+        foreach ($galaxy['GalaxyCluster'] as $cluster) {
+            foreach ($cluster['GalaxyElement'] as $element) {
+                if ($element['key'] === 'Population') {
+                    $this->__populationData[$cluster['description']] = $element['value'];
+                }
+            }
+        }
+        return true;
     }
 
     private function __handleEvents($events, $options)
@@ -83,6 +137,10 @@ class CsseCovidWidget
         }
         if ($options['type'] === 'mortality') {
             foreach ($data as $k => $v) {
+                if (!isset($v['death']) || empty($v['confirmed'])) {
+                    unset($data[$k]);
+                    continue;
+                }
                 $data[$k] = round(100 * (empty($v['death']) ? 0 : $v['death']) / $v['confirmed'], 2);
             }
         }
