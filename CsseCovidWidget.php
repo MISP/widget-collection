@@ -10,7 +10,7 @@ class CsseCovidWidget
         'event_info' => 'Substring included in the info field of relevant CSSE COVID-19 events.',
         'type' => 'Type of data used for the widget (confirmed, death, recovered, mortality).',
         'logarithmic' => 'Use a log10 scale for the graph (set via 0/1).',
-        'relative' => 'Take the country\'s population size into account (count / 1M)'
+        'relative' => 'Take the country\'s population size into account (count / 10M)'
     );
     public $description = 'Widget visualising the countries ranked by highest count in the chosen category.';
     public $placeholder =
