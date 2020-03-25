@@ -145,12 +145,14 @@ class CsseCovidTrendsWidget
                     }
                 }
             } else if ($options['insight'] == 'percent') {
-                foreach ($data as $k => &$countryData) {
+                foreach ($data as $k => $countryData) {
                     foreach ($countryData as $type => &$value) {
                         if (empty($previous[$k][$type])) {
                             $previous[$k][$type] = $data[$k][$type];
                         }
-                        $data[$k]['percent'] = ($data[$k][$type] - $previous[$k][$type]) / $previous[$k][$type];
+                        if (!empty($previous[$k][$type])) {
+                            $data[$k]['percent'] = 100 * ($data[$k][$type] - $previous[$k][$type]) / $previous[$k][$type];
+                        }
                     }
                 }
             }
