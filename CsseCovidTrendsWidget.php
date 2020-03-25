@@ -136,10 +136,10 @@ class CsseCovidTrendsWidget
         }
         if (!empty($options['insight']) && $options['insight'] !== 'raw') {
             if ($options['insight'] == 'growth') {
-                foreach ($data as $k => &$countryData) {
+                foreach ($data as $k => $countryData) {
                     foreach ($countryData as $type => &$value) {
-                        if (empty($previous[$k][$type])) {
-                            $previous[$k][$type] = 0;
+                        if (!isset($previous[$k][$type])) {
+                            $previous[$k][$type] = $data[$k][$type];
                         }
                         $data[$k]['growth'] = $data[$k][$type] - $previous[$k][$type];
                     }
