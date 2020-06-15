@@ -14,7 +14,8 @@ class AuthenticationFailureWidget
     public $placeholder =
 '{
     "event_info": "%Authentication Failure Daily Event%",
-    "type": "sshd"
+    "type": "sshd",
+    "absciss": "username"
 }';
 
 
@@ -35,6 +36,9 @@ class AuthenticationFailureWidget
         $data = array();
         if (empty($options['type'])) {
             $options['type'] = 'sshd';
+        }
+        if (empty($options['absciss'])) {
+            $options['absciss'] = 'username';
         }
         if (!empty($eventIds)) {
             $events = $this->Event->fetchEvent($user, $params);
@@ -74,10 +78,10 @@ class AuthenticationFailureWidget
 
     private function __rearrangeResults($data, $temp, $options)
     {
-        $username = $temp['username'];
+        $target = $temp[$options['absciss']];
         $type = $options['type'];
         if ($temp['type'] === $type || $type === 'all' ) {
-            $data[$username] = $temp['total'];
+            $data[$target] = $temp['total'];
         }
 
         return $data;
@@ -86,7 +90,7 @@ class AuthenticationFailureWidget
     private function __interpretObject($object)
     {
         $temp = array();
-        $validFields = array('type', 'username', 'total');
+        $validFields = array('type', 'username', 'total', 'ip-dst', 'ip-src');
         foreach ($object['Attribute'] as $attribute) {
             if (in_array($attribute['object_relation'], $validFields)) {
                 if ($attribute['object_relation'] == 'total') {
